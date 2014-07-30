@@ -6,7 +6,10 @@ import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fluids.FluidRegistry;
 import pcl.lc.api.internal.IModule;
-import pcl.lc.base.render.WrittenFontRenderer;
+import pcl.lc.base.render.font.FontMetric;
+import pcl.lc.base.render.font.FontRenderBuffer;
+import pcl.lc.base.render.font.LayoutCalculator;
+import pcl.lc.base.render.font.WrittenFontRenderer;
 import pcl.lc.cfg.ConfigHelper;
 import pcl.lc.cfg.ModuleConfig;
 import pcl.lc.core.ModuleManager;
@@ -28,6 +31,7 @@ import pcl.lc.module.core.item.ItemTokraSpawnEgg;
 import pcl.lc.module.core.render.BlockModelRenderer;
 import pcl.lc.module.core.render.BlockRotationOrientedRenderer;
 import pcl.lc.module.core.render.BlockVoidRenderer;
+import pcl.lc.util.CreativeTabHelper;
 import pcl.lc.util.RegistrationHelper;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
@@ -60,7 +64,11 @@ public class ModuleCore implements IModule {
 		public static BlockRotationOrientedRenderer blockOrientedRenderer;
 		public static BlockVoidRenderer blockVoidRenderer;
 		public static BlockModelRenderer blockModelRenderer;
-		public static WrittenFontRenderer danielFontRenderer;
+
+		public static FontMetric danielFont;
+		public static LayoutCalculator fontCalculator;
+		public static FontRenderBuffer danielFontBuffer;
+		public static WrittenFontRenderer fontRenderer;
 	}
 
 	@Override
@@ -82,17 +90,26 @@ public class ModuleCore implements IModule {
 	public void init(FMLInitializationEvent event) {
 		ModuleConfig config = ModuleManager.getConfig(this);
 
+		Items.debugger = RegistrationHelper.registerItem(ItemDebugTool.class, "lanteadebug", null);
+		CreativeTabHelper.registerTab("LanteaCraft", Items.debugger);
+		CreativeTabHelper.registerTab("LanteaCraft: Stargates", Items.debugger);
+		CreativeTabHelper.registerTab("LanteaCraft: Machines", Items.debugger);
+
 		Blocks.lanteaOre = RegistrationHelper.registerBlock(BlockLanteaOre.class, ItemLanteaOreBlock.class,
 				"lanteaOreBlock");
-		Items.reagentItem = RegistrationHelper.registerItem(ItemCraftingReagent.class, "lanteaCraftingReagent");
-		Items.lanteaOreItem = RegistrationHelper.registerItem(ItemLanteaOre.class, "lanteaOreItem");
-		Items.lanteaOreIngot = RegistrationHelper.registerItem(ItemLanteaOreIngot.class, "lanteaOreIngot");
-		Items.jacksonNotebook = RegistrationHelper.registerItem(ItemJacksonNotebook.class, "jacksonNotebook");
+		Items.reagentItem = RegistrationHelper.registerItem(ItemCraftingReagent.class, "lanteaCraftingReagent",
+				CreativeTabHelper.getTab("LanteaCraft"));
+		Items.lanteaOreItem = RegistrationHelper.registerItem(ItemLanteaOre.class, "lanteaOreItem",
+				CreativeTabHelper.getTab("LanteaCraft"));
+		Items.lanteaOreIngot = RegistrationHelper.registerItem(ItemLanteaOreIngot.class, "lanteaOreIngot",
+				CreativeTabHelper.getTab("LanteaCraft"));
+		Items.jacksonNotebook = RegistrationHelper.registerItem(ItemJacksonNotebook.class, "jacksonNotebook",
+				CreativeTabHelper.getTab("LanteaCraft"));
 		Blocks.lanteaOreAsBlock = RegistrationHelper.registerBlock(BlockOfLanteaOre.class, ItemBlockOfLanteaOre.class,
-				"lanteaOreIngotBlock");
+				"lanteaOreIngotBlock", CreativeTabHelper.getTab("LanteaCraft"));
 
-		Items.tokraSpawnEgg = RegistrationHelper.registerItem(ItemTokraSpawnEgg.class, "tokraSpawnEgg");
-		Items.debugger = RegistrationHelper.registerItem(ItemDebugTool.class, "lanteadebug");
+		Items.tokraSpawnEgg = RegistrationHelper.registerItem(ItemTokraSpawnEgg.class, "tokraSpawnEgg",
+				CreativeTabHelper.getTab("LanteaCraft"));
 
 		RegistrationHelper.newShapelessRecipe(new ItemStack(Items.lanteaOreIngot, 1), new ItemStack(
 				Items.lanteaOreItem, 1), net.minecraft.init.Items.iron_ingot);
@@ -111,9 +128,9 @@ public class ModuleCore implements IModule {
 		Fluids.fluidLiquidNaquadah = new LiquidNaquadah();
 		FluidRegistry.registerFluid(Fluids.fluidLiquidNaquadah);
 		Fluids.fluidLiquidNaquadahHost = RegistrationHelper.registerBlock(BlockLiquidNaquadah.class, ItemBlock.class,
-				"blockLiquidNaquadah", false);
+				"blockLiquidNaquadah", null);
 		Fluids.fluidLiquidNaquadahBucket = RegistrationHelper.registerSpecialBucket(Fluids.fluidLiquidNaquadahHost,
-				"liquidNaquadahBucket", "naquadah");
+				"liquidNaquadahBucket", "naquadah", CreativeTabHelper.getTab("LanteaCraft"));
 
 		RegistrationHelper.registerOre("oreNaquadah", new ItemStack(Blocks.lanteaOre));
 		RegistrationHelper.registerOre("naquadah", new ItemStack(Items.lanteaOreItem));
@@ -134,10 +151,13 @@ public class ModuleCore implements IModule {
 			Render.blockModelRenderer = new BlockModelRenderer();
 			RegistrationHelper.registerRenderer(Render.blockModelRenderer);
 
-			Render.danielFontRenderer = new WrittenFontRenderer(
-					ResourceAccess.getNamedResource("textures/notebook/daniel.png"),
+			Render.fontCalculator = new LayoutCalculator();
+			Render.fontRenderer = new WrittenFontRenderer();
+
+			Render.danielFont = new FontMetric(ResourceAccess.getNamedResource("textures/notebook/daniel.png"),
 					ResourceAccess.getNamedResource("textures/notebook/daniel.metrics.xml"));
-			Render.danielFontRenderer.buildFont();
+			Render.danielFont.buildFont();
+			Render.danielFontBuffer = new FontRenderBuffer(Render.danielFont);
 		}
 	}
 

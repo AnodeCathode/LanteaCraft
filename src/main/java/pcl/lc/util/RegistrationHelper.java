@@ -6,7 +6,10 @@ import java.util.Map;
 
 import net.minecraft.block.Block;
 import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
+import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.entity.Entity;
 import net.minecraft.inventory.Container;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
@@ -69,7 +72,8 @@ public class RegistrationHelper {
 	 */
 	public static Map<Integer, BlockItemMapping> getBlockMappings() {
 		if (!isLateRegistrationZone)
-			return null;
+			LanteaCraft.getLogger().log(Level.WARN,
+					"Block registration mappings are being accessed earlier than init::finish, problems may occur.");
 		return registeredBlocks;
 	}
 
@@ -138,7 +142,7 @@ public class RegistrationHelper {
 	 */
 	public static <T extends Block> T registerBlock(Class<? extends T> classOf, Class<? extends ItemBlock> itemClassOf,
 			String unlocalizedName) {
-		return registerBlock(classOf, itemClassOf, unlocalizedName, true);
+		return registerBlock(classOf, itemClassOf, unlocalizedName, CreativeTabHelper.getTab("LanteaCraft"));
 	}
 
 	/**
@@ -156,7 +160,7 @@ public class RegistrationHelper {
 	 * @return The Block singleton.
 	 */
 	public static <T extends Block> T registerBlock(Class<? extends T> classOf, Class<? extends ItemBlock> itemClassOf,
-			String unlocalizedName, boolean inCreativeTabs) {
+			String unlocalizedName, CreativeTabs tab) {
 		LanteaCraft.getLogger().log(Level.DEBUG, String.format("Attempting to register block %s", unlocalizedName));
 		if (isLateRegistrationZone)
 			LanteaCraft.getLogger().log(Level.WARN, "Warning, registration of this block is later than was expected!");
@@ -164,8 +168,7 @@ public class RegistrationHelper {
 			Constructor<? extends T> ctor = classOf.getConstructor();
 			T theMysteryBlock = ctor.newInstance();
 			theMysteryBlock.setBlockName(unlocalizedName);
-			if (inCreativeTabs)
-				theMysteryBlock.setCreativeTab(LanteaCraft.getCreativeTab());
+			theMysteryBlock.setCreativeTab(tab);
 			GameRegistry.registerBlock(theMysteryBlock, itemClassOf, unlocalizedName);
 			registeredBlocks.put(registeredBlocks.size(), new BlockItemMapping(classOf, itemClassOf));
 			return theMysteryBlock;
@@ -184,14 +187,14 @@ public class RegistrationHelper {
 	 *            The unlocalized name.
 	 * @return The Item singleton.
 	 */
-	public static <T extends Item> T registerItem(Class<? extends T> classOf, String unlocalizedName) {
+	public static <T extends Item> T registerItem(Class<? extends T> classOf, String unlocalizedName, CreativeTabs tab) {
 		LanteaCraft.getLogger().log(Level.DEBUG, "Attempting to register item " + unlocalizedName);
 		if (isLateRegistrationZone)
 			LanteaCraft.getLogger().log(Level.WARN, "Warning, registration of this item is later than was expected!");
 		try {
 			Constructor<? extends T> ctor = classOf.getConstructor();
 			T theMysteryItem = ctor.newInstance();
-			theMysteryItem.setUnlocalizedName(unlocalizedName).setCreativeTab(LanteaCraft.getCreativeTab());
+			theMysteryItem.setUnlocalizedName(unlocalizedName).setCreativeTab(tab);
 			GameRegistry.registerItem(theMysteryItem, unlocalizedName);
 			registeredItems.put(registeredItems.size(), classOf);
 			return theMysteryItem;
@@ -212,13 +215,14 @@ public class RegistrationHelper {
 	 *            The texture target for the bucket.
 	 * @return The ItemSpecialBucket singleton for this host fluid.
 	 */
-	public static ItemSpecialBucket registerSpecialBucket(Block hostOf, String unlocalizedName, String bucketTextureName) {
+	public static ItemSpecialBucket registerSpecialBucket(Block hostOf, String unlocalizedName,
+			String bucketTextureName, CreativeTabs tab) {
 		LanteaCraft.getLogger().log(Level.DEBUG, "Attempting to register SpecialBucket " + unlocalizedName);
 		if (isLateRegistrationZone)
 			LanteaCraft.getLogger().log(Level.WARN,
 					"Warning, registration of this SpecialBucket is later than was expected!");
 		ItemSpecialBucket bucket = new ItemSpecialBucket(hostOf);
-		bucket.setUnlocalizedName(unlocalizedName).setCreativeTab(LanteaCraft.getCreativeTab());
+		bucket.setUnlocalizedName(unlocalizedName).setCreativeTab(tab);
 		bucket.setTargetTexture(bucketTextureName);
 		GameRegistry.registerItem(bucket, unlocalizedName);
 		return bucket;
@@ -351,11 +355,15 @@ public class RegistrationHelper {
 	 * @param renderer
 	 *            The renderer object
 	 */
-	public static void addTileEntityRenderer(Class<? extends TileEntity> teClass, TileEntitySpecialRenderer renderer) {
+	public static void addTileEntityRenderer(Class<? extends TileEntity> teClass, Object renderer) {
 		if (isLateRegistrationZone)
 			LanteaCraft.getLogger().log(Level.WARN,
 					"Warning, registration of this tile-entity renderer is later than was expected!");
-		ClientRegistry.bindTileEntitySpecialRenderer(teClass, renderer);
+		ClientRegistry.bindTileEntitySpecialRenderer(teClass, (TileEntitySpecialRenderer) renderer);
+	}
+
+	public static void registerEntityRenderer(Class<? extends Entity> entity, Object renderer) {
+		RenderingRegistry.registerEntityRenderingHandler(entity, (Render) renderer);
 	}
 
 	/**
@@ -369,7 +377,7 @@ public class RegistrationHelper {
 	 * @return The decal stair instance.
 	 */
 	@Deprecated
-	public static BlockLanteaDecorStair registerStairDecal(String unlocalizedName, int targetMetadata) {
+	public static BlockLanteaDecorStair registerStairDecal(String unlocalizedName, int targetMetadata, CreativeTabs tab) {
 		LanteaCraft.getLogger().log(Level.DEBUG,
 				String.format("Attempting to register stair decal %s", unlocalizedName));
 		if (isLateRegistrationZone)
@@ -377,7 +385,7 @@ public class RegistrationHelper {
 					"Warning, registration of this stair decal is later than was expected!");
 		try {
 			BlockLanteaDecorStair stair = new BlockLanteaDecorStair(targetMetadata);
-			stair.setBlockName(unlocalizedName).setCreativeTab(LanteaCraft.getCreativeTab());
+			stair.setBlockName(unlocalizedName).setCreativeTab(tab);
 			GameRegistry.registerBlock(stair, unlocalizedName);
 			return stair;
 		} catch (Exception e) {

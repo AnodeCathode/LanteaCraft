@@ -1,5 +1,10 @@
 package pcl.lc.module.stargate.block;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
+
+import org.apache.logging.log4j.Level;
+
 import net.minecraft.block.material.Material;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.IIconRegister;
@@ -16,7 +21,6 @@ import pcl.lc.LanteaCraft;
 import pcl.lc.base.RotationOrientedBlock;
 import pcl.lc.core.ResourceAccess;
 import pcl.lc.module.ModuleStargates;
-import pcl.lc.module.stargate.gui.ScreenStargateDHD;
 import pcl.lc.module.stargate.tile.TileStargateDHD;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -100,8 +104,7 @@ public class BlockStargateDHD extends RotationOrientedBlock {
 		if (side != ForgeDirection.UP.ordinal())
 			player.openGui(LanteaCraft.getInstance(), LanteaCraft.EnumGUIs.StargateDHDEnergy.ordinal(), world, x, y, z);
 		else {
-			TileStargateDHD tile = (TileStargateDHD) world.getTileEntity(x, y, z);
-			Minecraft.getMinecraft().displayGuiScreen(new ScreenStargateDHD(tile, player));
+			player.openGui(LanteaCraft.getInstance(), LanteaCraft.EnumGUIs.StargateDHD.ordinal(), world, x, y, z);
 		}
 		return true;
 	}

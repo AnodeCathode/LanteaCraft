@@ -1,10 +1,12 @@
 package pcl.lc.module.stargate.tile;
 
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.Packet;
 import pcl.lc.LanteaCraft;
 import pcl.lc.base.TileManaged;
 import pcl.lc.base.network.packet.ModPacket;
+import pcl.lc.base.network.packet.StandardModPacket;
 import pcl.lc.module.stargate.StargatePart;
 import pcl.lc.util.WorldLocation;
 
@@ -13,8 +15,15 @@ public class TileStargateRing extends TileManaged {
 
 	@Override
 	public Packet getDescriptionPacket() {
-		ModPacket packet = part.pack();
-		LanteaCraft.getNetPipeline().sendToAllAround(packet, new WorldLocation(this), 128.0d);
+		if (!worldObj.isRemote){ 
+			ModPacket packet = part.pack();
+			LanteaCraft.getNetPipeline().sendToAllAround(packet, new WorldLocation(this), 128.0d);
+		} else {
+			StandardModPacket req = new StandardModPacket(new WorldLocation(this));
+			req.setIsForServer(true);
+			req.setType("LanteaPacket.MultiblockPoll");
+			LanteaCraft.getNetPipeline().sendToServer(req);
+		}
 		return null;
 	}
 
@@ -22,6 +31,16 @@ public class TileStargateRing extends TileManaged {
 	public void thinkPacket(ModPacket packetOf, EntityPlayer player) {
 		part.unpack(packetOf);
 		worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
+	}
+
+	@Override
+	public void readFromNBT(NBTTagCompound compound) {
+		// TODO: Load chunks from NBT
+	}
+
+	@Override
+	public void writeToNBT(NBTTagCompound compound) {
+		// TODO: Save chunks to NBT
 	}
 
 	public StargatePart getAsPart() {

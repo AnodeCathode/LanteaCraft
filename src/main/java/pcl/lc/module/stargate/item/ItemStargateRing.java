@@ -1,11 +1,14 @@
 package pcl.lc.module.stargate.item;
 
 import net.minecraft.block.Block;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.IIcon;
+import net.minecraft.world.World;
 import pcl.lc.core.ResourceAccess;
 import pcl.lc.module.ModuleStargates;
+import pcl.lc.module.stargate.tile.TileStargateRing;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 

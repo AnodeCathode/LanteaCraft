@@ -42,16 +42,6 @@ public class LanteaCraft {
 	public static LanteaCraftCommonProxy proxy;
 
 	/**
-	 * Creative tab instance
-	 */
-	private static CreativeTabHelper lanteaCraftTab = new CreativeTabHelper(CreativeTabs.getNextID(), "LanteaCraft") {
-		@Override
-		public Item getTabIconItem() {
-			return ModuleCore.Items.debugger;
-		}
-	};
-
-	/**
 	 * The private instance of the logger used. Use {@link #getLogger()} to
 	 * access this object safely
 	 */
@@ -99,16 +89,6 @@ public class LanteaCraft {
 	}
 
 	/**
-	 * Gets the current CreativeTabs creative-tab object
-	 * 
-	 * @return The current creative tab
-	 */
-	public static CreativeTabs getCreativeTab() {
-		LanteaCraft.getInstance();
-		return LanteaCraft.lanteaCraftTab;
-	}
-
-	/**
 	 * Gets the current SpecialBucketHandler
 	 * 
 	 * @return The current SpecialBucketHandler
@@ -118,7 +98,7 @@ public class LanteaCraft {
 	}
 
 	public static enum EnumGUIs {
-		StargateBase, StargateDHDEnergy, NaquadahGenerator, CrystalInfuser;
+		StargateBase, StargateDHD, StargateDHDEnergy, NaquadahGenerator, CrystalInfuser;
 	}
 
 	/**

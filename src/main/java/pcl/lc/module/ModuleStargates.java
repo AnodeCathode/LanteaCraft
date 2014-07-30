@@ -4,6 +4,7 @@ import java.util.EnumSet;
 import java.util.Set;
 
 import net.minecraft.block.Block;
+import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.client.MinecraftForgeClient;
 import pcl.lc.LanteaCraft;
@@ -22,6 +23,7 @@ import pcl.lc.module.stargate.gui.ContainerStargateBase;
 import pcl.lc.module.stargate.gui.ContainerStargateDHDEnergy;
 import pcl.lc.module.stargate.item.ItemGDO;
 import pcl.lc.module.stargate.item.ItemIris;
+import pcl.lc.module.stargate.item.ItemStargateBase;
 import pcl.lc.module.stargate.item.ItemStargateRing;
 import pcl.lc.module.stargate.item.ItemTransportRingActivator;
 import pcl.lc.module.stargate.item.ItemTransporterRing;
@@ -40,6 +42,7 @@ import pcl.lc.module.stargate.tile.TileStargateBase;
 import pcl.lc.module.stargate.tile.TileStargateDHD;
 import pcl.lc.module.stargate.tile.TileStargateRing;
 import pcl.lc.module.stargate.tile.TileTransporterRing;
+import pcl.lc.util.CreativeTabHelper;
 import pcl.lc.util.RegistrationHelper;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
@@ -104,22 +107,26 @@ public class ModuleStargates implements IModule {
 		TileStargateBase.configure(config);
 
 		Blocks.stargateRingBlock = RegistrationHelper.registerBlock(BlockStargateRing.class, ItemStargateRing.class,
-				"stargateRing");
-		Blocks.stargateBaseBlock = RegistrationHelper.registerBlock(BlockStargateBase.class, "stargateBase");
-		Blocks.stargateControllerBlock = RegistrationHelper.registerBlock(BlockStargateDHD.class, "stargateDHD");
+				"stargateRing", CreativeTabHelper.getTab("LanteaCraft: Stargates"));
+		Blocks.stargateBaseBlock = RegistrationHelper.registerBlock(BlockStargateBase.class, ItemStargateBase.class,
+				"stargateBase", CreativeTabHelper.getTab("LanteaCraft: Stargates"));
+		Blocks.stargateControllerBlock = RegistrationHelper.registerBlock(BlockStargateDHD.class, ItemBlock.class,
+				"stargateDHD", CreativeTabHelper.getTab("LanteaCraft: Stargates"));
 
 		Blocks.transporterRing = RegistrationHelper.registerBlock(BlockTransporterRing.class,
-				ItemTransporterRing.class, "ringPlatform");
+				ItemTransporterRing.class, "ringPlatform", CreativeTabHelper.getTab("LanteaCraft: Stargates"));
 
 		GameRegistry.registerTileEntity(TileStargateBase.class, "tileEntityStargateBase");
 		GameRegistry.registerTileEntity(TileStargateRing.class, "tileEntityStargateRing");
 		GameRegistry.registerTileEntity(TileStargateDHD.class, "tileEntityStargateDHD");
 		GameRegistry.registerTileEntity(TileTransporterRing.class, "tileEntityRingPlatform");
-		Items.iris = RegistrationHelper.registerItem(ItemIris.class, "iris");
-		Items.gdo = RegistrationHelper.registerItem(ItemGDO.class, "gdo");
+		Items.iris = RegistrationHelper.registerItem(ItemIris.class, "iris",
+				CreativeTabHelper.getTab("LanteaCraft: Stargates"));
+		Items.gdo = RegistrationHelper.registerItem(ItemGDO.class, "gdo",
+				CreativeTabHelper.getTab("LanteaCraft: Stargates"));
 
 		Items.transportRingActivator = RegistrationHelper.registerItem(ItemTransportRingActivator.class,
-				"transportRingActivator");
+				"transportRingActivator", CreativeTabHelper.getTab("LanteaCraft: Stargates"));
 
 		RegistrationHelper.newRecipe(new ItemStack(Blocks.stargateRingBlock, 1), "ICI", "NNN", "III", 'I',
 				net.minecraft.init.Items.iron_ingot, 'N', new ItemStack(ModuleCore.Items.lanteaOreIngot), 'C',
